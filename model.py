@@ -1,4 +1,5 @@
 from torch import nn
+import torch
 import torch.nn.functional as F
 
 
@@ -89,6 +90,36 @@ class FlowerNet50(nn.Module):
         out = out.view(out.size(0), -1)
         out = self.linear(out)
         return out
+
+    @staticmethod
+    def save_checkpoint(epoch, model, optimizer, loss, path):
+        torch.save({'epoch': epoch,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'loss': loss}, path)
+
+    @staticmethod
+    def load_checkpoint(model_inst, optimizer_inst, file_path, train=False):
+        """
+        :param model_inst: TheModelClass(*args, **kwargs)
+        :param optimizer_inst: TheOptimizerClass(*args, **kwargs)
+        :param file_path: path where model stored
+        :param train: set model to train mode or evaluate
+        """
+        model = model_inst
+        optimizer = optimizer_inst
+        checkpoint = torch.load(file_path)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        epoch = checkpoint['epoch']
+        loss = checkpoint['loss']
+
+        if train:
+            model.train()
+        else:
+            model.eval()
+
+        return model, optimizer, epoch, loss
 
 
 def flower_net50():
