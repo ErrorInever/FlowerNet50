@@ -7,11 +7,11 @@ from torch.utils.data.dataset import Dataset
 
 
 class FlowerDataset(Dataset):
-
-    def __init__(self, data_dir, data_frame, transform=None):
+    """ custom dataset"""
+    def __init__(self, data_dir, data_frame, transforms=None):
         self.data_dir = data_dir
         self.data_frame = data_frame
-        self.transform = transform
+        self.transform = transforms
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.data_dir, self.data_frame.iloc[idx, 0])
@@ -36,7 +36,7 @@ def prepare_data(data_dir, val_num=.6, test_num=.8):
     :return: three dataframes with columns ['img_path', 'label']
     """
     data_frame = pd.DataFrame(columns=['img_path', 'label'])
-
+    print('Creating dataframes...')
     for flower in tqdm(os.listdir(data_dir)):
         folder_path = os.path.join(data_dir, flower)
         flowers = os.listdir(folder_path)
@@ -52,4 +52,8 @@ def prepare_data(data_dir, val_num=.6, test_num=.8):
     train, validate, test = np.split(data_frame.sample(frac=1),
                                      [int(val_num * len(data_frame)),
                                       int(test_num * len(data_frame))])
+
+    print('Successful\n lengths| train:{}, validate:{}, test:{}'
+          .format(len(train), len(validate), len(test)))
+
     return train, validate, test
