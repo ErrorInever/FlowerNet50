@@ -1,1 +1,1 @@
-NET for kaggle dataset
+Model for classification flowers 
